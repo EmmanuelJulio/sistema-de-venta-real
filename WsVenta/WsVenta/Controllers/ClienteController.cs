@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using WsVenta.Models;
-using WsVenta.Models.Viewmodel;
+using WsVenta.Models.Request;
 using WsVenta.Models.Response;
 using Microsoft.AspNetCore.Authentication.OAuth;
 
@@ -16,7 +16,7 @@ namespace WsVenta.Controllers
     [ApiController]
 
 
-    public class ClienteController : ControllerBase
+    public class ClienteController : ControllerBase 
     {
         [HttpGet]
         public IActionResult Get()
@@ -75,6 +75,29 @@ namespace WsVenta.Controllers
                 using (VentaRealContext db = new VentaRealContext())
                 {
                     Cliente oCliente = db.Cliente.Find(oModel.Id);
+                    db.Remove(oCliente);
+                    db.SaveChanges();
+                    respuesta.Exito = 1;
+                }
+
+            }
+            catch (Exception ex)
+            {
+
+                respuesta.Mensaje = ex.Message;
+            }
+            return Ok(respuesta);
+        }
+        [HttpDelete("{Id}")]
+        public IActionResult delete(ClienteRequest oModel)
+
+        {
+            respuesta respuesta = new respuesta();
+            try
+            {
+                using (VentaRealContext db = new VentaRealContext())
+                {
+                    Cliente oCliente = db.Cliente.Find(oModel.Id);
                     oCliente.Nombre = oModel.Nombre;
                     db.Entry(oCliente).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
                     db.SaveChanges();
@@ -89,7 +112,7 @@ namespace WsVenta.Controllers
             }
             return Ok(respuesta);
         }
+
     }
-   
 }
 
